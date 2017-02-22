@@ -1,0 +1,35 @@
+#clientIpAddress;domainName;remoteUser;monthDate;request;httpStatusCode;bytesSent;referer;userAgent
+
+CREATE EXTERNAL TABLE datasmall(
+clientIpAddress STRING COMMENT 'IP Address of the User', 
+domainName STRING,
+remoteUser STRING,
+monthDate DATE,
+request STRING, 
+httpStatusCode INT,
+bytesSent INT,
+referer STRING,
+userAgent STRING)
+COMMENT 'Web server log'
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\;'
+STORED AS TEXTFILE
+location '/datalake/prepared/small';
+
+CREATE EXTERNAL TABLE data(
+clientIpAddress STRING COMMENT 'IP Address of the User', 
+domainName STRING,
+remoteUser STRING,
+monthDate DATE,
+request STRING, 
+httpStatusCode INT,
+bytesSent INT,
+referer STRING,
+userAgent STRING)
+COMMENT 'Web server log'
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\;'
+STORED AS TEXTFILE
+location '/datalake/prepared/big';
+
+SELECT monthDate,count(clientIpAddress) FROM DATASMALL GROUP BY monthDate;
