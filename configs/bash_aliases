@@ -1,0 +1,20 @@
+# BEGIN ANSIBLE MANAGED BLOCK
+ cdls() { clear; cd "$@"; ls; echo --------------------------------------------------------------------; }
+ alias cd=cdls
+ alias d=docker
+ alias a='clear;docker images;echo;docker ps -a'
+# END ANSIBLE MANAGED BLOCK
+
+alias h="hadoop fs"
+alias start-namenode="$HADOOP_PREFIX/sbin/hadoop-daemon.sh start namenode"
+alias start-datanode="$HADOOP_PREFIX/sbin/hadoop-daemon.sh start datanode"
+alias start-resource-manager="$HADOOP_PREFIX/sbin/yarn-daemon.sh start resourcemanager"
+alias start-node-manager="$HADOOP_PREFIX/sbin/yarn-daemon.sh start nodemanager"
+alias start-job-history-server="$HADOOP_PREFIX/sbin/mr-jobhistory-daemon.sh start historyserver"
+
+# Aliases for stopping Hadoop Processes
+alias stop-namenode="$HADOOP_PREFIX/sbin/hadoop-daemon.sh stop namenode"
+alias stop-datanode="$HADOOP_PREFIX/sbin/hadoop-daemon.sh stop datanode"
+alias stop-resource-manager="$HADOOP_PREFIX/sbin/yarn-daemon.sh stop resourcemanager"
+alias stop-node-manager="$HADOOP_PREFIX/sbin/yarn-daemon.sh stop nodemanager"
+alias stop-job-history-server="$HADOOP_PREFIX/sbin/mr-jobhistory-daemon.sh stop historyserver"
