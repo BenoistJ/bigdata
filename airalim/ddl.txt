@@ -1,0 +1,70 @@
+CREATE KEYSPACE z_app_di3_cass_keyspace WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '2'}  AND durable_writes = true;
+
+CREATE TABLE z_app_di3_cass_keyspace.bil_occup_totale_troncon (
+    troncon text,
+    cable text,
+    paire text,
+    niv_occ text,
+    voie text,
+    lien text,
+    atm text,
+    autres text,
+    cat text,
+    cdfonctint text,
+    client_dico_a text,
+    client_dico_b text,
+    clp text,
+    commut text,
+    couleur_eqptl_a int,
+    couleur_eqptl_b int,
+    domaine text,
+    entite_sup text,
+    etat text,
+    etat_comm text,
+    gtr text,
+    idelem_clp text,
+    ip text,
+    lib_article text,
+    ll_bd text,
+    mobile text,
+    nom_a text,
+    nom_b text,
+    nom_nat_a text,
+    nom_nat_b text,
+    nom_tit text,
+    nomprod text,
+    obs text,
+    oinis text,
+    owf text,
+    pdh text,
+    protection text,
+    ref_article text,
+    rtge text,
+    sdh text,
+    topologie text,
+    typ_client text,
+    typ_clp text,
+    typ_dico_a text,
+    typ_dico_b text,
+    typ_eqptl_a text,
+    typ_eqptl_b text,
+    typ_lien text,
+    typ_reseau_lien text,
+    typ_topologie text,
+    wdm text,
+    xdsl text,
+    PRIMARY KEY (troncon, cable, paire, niv_occ, voie, lien)
+) WITH CLUSTERING ORDER BY (cable ASC, paire ASC, niv_occ ASC, voie ASC, lien ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys':'ALL', 'rows_per_partition':'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
+    AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99.0PERCENTILE';
