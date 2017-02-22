@@ -33,3 +33,11 @@ STORED AS TEXTFILE
 location '/datalake/prepared/big';
 
 SELECT monthDate,count(clientIpAddress) FROM DATASMALL GROUP BY monthDate;
+  
+SELECT monthDate, count(clientIpAddress)
+FROM (
+  SELECT DISTINCT monthDate, clientIpAddress
+  FROM datasmall
+) mysubqueryresult
+GROUP BY monthDate
+ORDER BY monthDate ASC;
