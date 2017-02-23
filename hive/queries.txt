@@ -37,7 +37,8 @@ SELECT monthDate,count(clientIpAddress) FROM DATASMALL GROUP BY monthDate;
 SELECT monthDate, count(clientIpAddress)
 FROM (
   SELECT DISTINCT monthDate, clientIpAddress
-  FROM datasmall
+  FROM data
 ) mysubqueryresult
 GROUP BY monthDate
 ORDER BY monthDate ASC;
+--> 02:07 on Hive
