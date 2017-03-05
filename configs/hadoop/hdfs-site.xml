@@ -19,11 +19,11 @@
 <configuration>
  	<property>
                 <name>dfs.namenode.name.dir</name>
-                <value>/media/disk2/hadoopdata/namenode</value>
+                <value>/media/disk1/hadoopdata/namenode</value>
         </property>
 	<property>
 		<name>dfs.datanode.data.dir</name>
-		<value>/media/disk2/hadoopdata/datanode</value>
+		<value>/media/disk1/hadoopdata/datanode</value>
 	</property>
         <property>
                 <name>dfs.webhdfs.enabled</name>
