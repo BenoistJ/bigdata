@@ -1,0 +1,10 @@
+SELECT COUNT(*)
+FROM dfs.`/datalake/prepared/big/data.csv`
+
+SELECT monthDate, count(clientIpAddress)
+FROM (
+  SELECT DISTINCT columns[3] as monthDate, columns[0] as clientIpAddress
+  FROM dfs.`/datalake/prepared/big/data.csv`
+)
+GROUP BY monthDate
+ORDER BY monthDate ASC;
