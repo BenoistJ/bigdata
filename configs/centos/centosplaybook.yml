@@ -292,3 +292,4 @@
       git:
         repo: git@github.com:BenoistJ/bigdata.git
         dest: /root
+        accept_hostkey: true
