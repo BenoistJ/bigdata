@@ -1,0 +1,294 @@
+---
+- hosts: vmbase
+  tasks:
+    - name: update operating system to latest version
+      yum:
+        name: '*'
+        state: latest
+
+    - name: install vmware tools
+      yum:
+        name: open-vm-tools
+        
+    - name: install nano
+      yum:
+        name: nano
+
+    - name: install curl
+      yum:
+        name: curl
+
+    - name: install ntp
+      yum:
+        name: ntp
+
+    - name: install python
+      yum:
+        name: python
+
+    - name: add aliases
+      blockinfile:
+        dest=~/.bashrc
+        create=true
+        block="
+          cdls() { clear; cd "$@"; ls; echo --------------------------------------------------------------------; }\n
+          alias cd=cdls\n
+          alias d=docker\n
+          alias a='clear;docker images;echo;docker ps -a'\n
+          alias drm='docker rm -f $(docker ps -a -q)'\n
+          alias gc='git commit -am "..."'\n"
+
+    - name: add '.' to path
+      lineinfile:
+        dest=~/.bashrc
+        line="export PATH=.:$PATH"
+
+    - name: set timezone to Europe/Paris
+      timezone:
+        name: Europe/Paris
+        
+    - name: disable selinux
+      selinux:
+        state: disabled
+
+    - name: disable firewall
+      service:
+        name: firewalld
+        enabled: no
+
+    - name: disable tuned
+      service:
+        name: tuned
+        enabled: no
+
+    - name: enable ntpd
+      service:
+        name: ntpd
+        enabled: yes
+
+    - name: reduce swappiness
+      sysctl:
+        name: vm.swappiness
+        value: 5
+        state: present
+
+    - name: change grub timeout
+      replace:
+        dest: /etc/default/grub
+        regexp: 'GRUB_TIMEOUT=5'
+        replace: 'GRUB_TIMEOUT=1'
+
+    - name: disable transparent hugepage
+      lineinfile:
+        dest: /etc/rc.local
+        line: 'echo never > /sys/kernel/mm/transparent_hugepage/enabled'
+
+    - name: disable transparent hugepage defrag
+      lineinfile:
+        dest: /etc/rc.local
+        line: 'echo never > /sys/kernel/mm/transparent_hugepage/defrag'
+
+    - name: change .bashrc cp
+      replace:
+        dest: .bashrc
+        regexp: '^alias cp'
+        replace: '#alias cp'	
+
+    - name: change .bashrc mv
+      replace:
+        dest: .bashrc
+        regexp: '^alias mv'
+        replace: '#alias mv'
+
+    - name: Download Oracle JDK
+      get_url:
+        url: http://download.oracle.com/otn-pub/java/jdk/8u121-b13/e9e7ea248e2c4826b92b3f075a80e441/jdk-8u121-linux-x64.rpm
+        dest: /root/jdk.rpm
+        headers: "Cookie: oraclelicense=accept-securebackup-cookie"
+        validate_certs: no
+
+    - name: install Oracle Java
+      yum:
+        name: /root/jdk.rpm
+
+    - name: set JAVA_HOME for all users
+      lineinfile:
+        dest: /etc/profile
+        line: "export JAVA_HOME=/usr/java/latest"
+
+    - name: remove jdk.rpm
+      file:
+        path: /root/jdk.rpm
+        state: absent    
+        
+    - name: create primary partition on /dev/sdb
+      shell: 'echo -e "o\nn\np\n1\n\n\nw" | fdisk /dev/sdb'
+      ignore_errors: true
+
+    - name: format /dev/sdb1 as ext3
+      filesystem:
+        fstype: ext3
+        dev: /dev/sdb1
+
+    - name: mount /media/disk1
+      mount:
+        name: /media/disk1
+        src: /dev/sdb1
+        state: mounted
+        fstype: ext3
+        opts: noatime
+        
+    - name: install rmate
+      get_url: 
+        url: https://raw.github.com/aurora/rmate/master/rmate
+        dest: /usr/local/bin/subl
+        mode: a+x
+
+    - name: remove git
+      yum:
+        name: git
+        state: absent
+
+
+- hosts: vmmaster
+  tasks:        
+    - name: install epel-release
+      yum:
+        name: epel-release
+      
+    - name: install 7zip
+      yum:
+        name: p7zip
+
+    - block: 
+        - name: install the 'Development tools' package group
+          yum:
+            name: "@Development tools"
+
+        - name: Install list of packages
+          yum:
+            name={{item}}
+          with_items:
+            - gettext-devel
+            - openssl-devel
+            - perl-CPAN
+            - perl-devel
+            - zlib-devel
+            - curl-devel
+            
+        - name: download git source code archive
+          get_url:
+            url: https://github.com/git/git/archive/v2.12.1.tar.gz
+            dest: /root/git.tar.gz
+
+        - name: unpack git    
+          unarchive:
+            src: /root/git.tar.gz
+            dest: /root
+            remote_src: yes
+
+        - name: delete git source code archive
+          file:
+            path: /root/git.tar.gz
+            state: absent
+
+        - name: make configure
+          make:
+            chdir: /root/git-2.12.1
+            target: configure
+
+        - name: run configure
+          shell: /root/git-2.12.1/configure --with-curl --prefix=/usr/local
+          args:
+            chdir: /root/git-2.12.1
+            
+        - name: make install
+          make:
+            chdir: /root/git-2.12.1
+            target: install
+            
+        - name: delete git folder
+          file:
+            path: /root/git-2.12.1
+            state: absent
+            
+        - name: configure git user.name
+          git_config:
+            name: user.name
+            value: Benoist
+            scope: global
+            
+        - name: configure git user.name
+          git_config:
+            name: user.email
+            value: benoist.jamin@gmail.com
+            scope: global
+            
+        - name: configure git push.default
+          git_config:
+            name="push.default"
+            value="simple"
+            scope=global
+
+        - name: configure git pull as-is and push as-is
+          git_config:
+            name="core.autocrlf"
+            value="false"
+            scope=global
+
+    - block:
+        - name: configure ssh client to disable host key checking
+          replace:
+            name: /etc/ssh/ssh_config
+            regexp: "#   StrictHostKeyChecking ask"
+            replace: "   StrictHostKeyChecking no"
+            
+        - name: download authorized_keys
+          get_url:
+            url: https://www.dropbox.com/s/wexmz59rvhhtl4k/id_rsa.pub
+            dest: .ssh/authorized_keys
+            
+        - name: download private certificate
+          get_url:
+            url: https://www.dropbox.com/s/btg3zl510xqf3pm/id_rsa
+            dest: .ssh/id_rsa
+            mode: 0600
+
+        - name: copy ssh files to bigdata2
+          shell: scp -r /root/.ssh/ bigdata2:/root/.ssh/
+          
+        - name: copy ssh files to bigdata3
+          shell: scp -r /root/.ssh/ bigdata3:.ssh/
+
+    - block:
+        - name: install postgresql
+          yum:
+            name: postgresql-server
+            
+        - name: init postgressql database
+          shell: postgresql-setup initdb
+          ignore_errors: true
+          
+        - name: configure postgresql.conf
+          replace:
+            name: /var/lib/pgsql/data/postgresql.conf
+            regexp: "#listen_addresses = 'localhost'"
+            replace: "listen_addresses = '*'"
+            
+        - name: configure postgresql.conf
+          shell: sed -i "82ihost    all             all             127.0.0.1/32            md5" /var/lib/pgsql/data/pg_hba.conf
+
+        - name: start postgresql service
+          service:
+            name: postgresql
+
+    - name: download cloudera manager
+      get_url:
+        url: https://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
+        dest: /root/cloudera-manager-installer.bin
+        mode: 700
+
+    - name: clone bigdata github repo
+      git:
+        repo: git@github.com:BenoistJ/bigdata.git
+        dest: /root
