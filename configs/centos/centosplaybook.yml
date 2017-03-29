@@ -14,6 +14,10 @@
       yum:
         name: nano
 
+    - name: install nano
+      yum:
+        name: wget
+        
     - name: install curl
       yum:
         name: curl
@@ -41,7 +45,7 @@
     - name: add '.' to path
       lineinfile:
         dest=~/.bashrc
-        line="export PATH=.:$PATH"
+        line="\nexport PATH=.:$PATH"
 
     - name: set timezone to Europe/Paris
       timezone:
@@ -88,6 +92,12 @@
         dest: /etc/rc.local
         line: 'echo never > /sys/kernel/mm/transparent_hugepage/defrag'
 
+    - name: change .bashrc rm
+      replace:
+        dest: .bashrc
+        regexp: 'rm -i'
+        replace: 'rm -f'
+        
     - name: change .bashrc cp
       replace:
         dest: .bashrc
