@@ -15,8 +15,9 @@ FIELDS TERMINATED BY '\;'
 STORED AS TEXTFILE
 location '/user/root/prepared/big';
 
-SELECT monthDate,count(clientIpAddress) FROM DATASMALL GROUP BY monthDate;
-  
+CREATE TABLE dataparquet STORED AS parquet AS
+SELECT * FROM data
+
 SELECT monthDate, count(clientIpAddress)
 FROM (
   SELECT DISTINCT monthDate, clientIpAddress
@@ -24,4 +25,5 @@ FROM (
 ) mysubqueryresult
 GROUP BY monthDate
 ORDER BY monthDate ASC;
+
 --> 02:07 on Hive
