@@ -4,7 +4,7 @@ CREATE EXTERNAL TABLE data (
   clientIpAddress STRING COMMENT 'IP Address of the User',
   domainName STRING,
   remoteUser STRING,
-  monthDate TIMESTAMP,
+  monthDate STRING,
   request STRING,
   httpStatusCode INT,
   bytesSent INT,
@@ -18,12 +18,10 @@ location '/user/root/prepared/big';
 CREATE TABLE dataparquet STORED AS parquet AS
 SELECT * FROM data
 
-SELECT monthDate, count(clientIpAddress)
-FROM (
-  SELECT DISTINCT monthDate, clientIpAddress
-  FROM data
-) mysubqueryresult
-GROUP BY monthDate
-ORDER BY monthDate ASC;
-
---> 02:07 on Hive
+SELECT monthDate, count(clientIpAddress) as total FROM
+  (SELECT DISTINCT monthDate, clientIpAddress
+   FROM `data`
+   WHERE domainName = 'www.mydemo.com') mysubqueryresult
+  GROUP BY monthDate
+  ORDER BY monthDate ASC
+LIMIT 10;
