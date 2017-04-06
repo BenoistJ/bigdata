@@ -12,20 +12,44 @@ CREATE TABLE datacsv (
   userAgent STRING)
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\;'
-STORED AS TEXTFILE;
+STORED AS TEXTFILE
 
-CREATE TABLE dataparquet STORED AS parquet AS SELECT * FROM data
+LOAD DATA INPATH 'hdfs:///user/root/data.csv' INTO TABLE datacsv
+
+CREATE TABLE datacsvpartitioned (
+  clientIpAddress STRING COMMENT 'IP Address of the User',
+  domainName STRING,
+  remoteUser STRING,
+  monthDate STRING,
+  request STRING,
+  httpStatusCode INT,
+  bytesSent INT,
+  referer STRING,
+  userAgent STRING)
+PARTITIONED BY (dn STRING)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\;'
+STORED AS TEXTFILE
+
+LOAD DATA INPATH 'hdfs:///user/root/datacom.csv' INTO TABLE datacsvpartitioned PARTITION (dn="www.mydemo.com")
+LOAD DATA INPATH 'hdfs:///user/root/datafr.csv' INTO TABLE datacsvpartitioned PARTITION (dn="www.mydemo.fr")
+
+CREATE TABLE dataparquet STORED AS parquet AS SELECT * FROM datacsv
+
+CREATE TABLE dataparquetpartitioned
+PARTITIONED BY (dn)
+STORED AS parquet
+AS SELECT * FROM datacsvpartitioned
 
 SELECT monthDate, count(clientIpAddress) as total
 FROM (
    SELECT DISTINCT monthDate, clientIpAddress
-   FROM `dataparquet`
-   WHERE domainName = 'www.mydemo.com'
+   FROM `dataparquetpartitioned`
+   WHERE dn = 'www.mydemo.fr'
 ) mysubqueryresult
 GROUP BY monthDate
 ORDER BY monthDate ASC
 LIMIT 10;
-
 
 ##############
 IMPALA
@@ -33,8 +57,8 @@ IMPALA
 SELECT monthDate, count(clientIpAddress) as total
 FROM (
    SELECT DISTINCT monthDate, clientIpAddress
-   FROM `dataparquet`
-   WHERE domainName = 'www.mydemo.com'
+   FROM `dataparquetpartitioned`
+   WHERE dn = 'www.mydemo.fr'
 ) mysubqueryresult
 GROUP BY monthDate
 ORDER BY monthDate ASC
@@ -52,11 +76,19 @@ FROM (
 GROUP BY monthDate
 ORDER BY monthDate ASC;
 
+SELECT monthDate, count(clientIpAddress)
+FROM (
+  SELECT DISTINCT columns[3] as monthDate, columns[0] as clientIpAddress
+  FROM dfs.`/user/root/datafr.csv`
+)
+GROUP BY monthDate
+ORDER BY monthDate ASC;
+
 SELECT monthDate, count(clientIpAddress) as total
 FROM (
   SELECT DISTINCT monthDate, clientIpAddress
-  FROM hive.`dataparquet`
-  WHERE domainName = 'www.mydemo.com'
+  FROM hive.`dataparquetpartitioned`
+  WHERE domainName = 'www.mydemo.fr'
 ) mysubqueryresult
 GROUP BY monthDate
 ORDER BY monthDate ASC
