@@ -49,7 +49,7 @@ val df3 = sqlContext.sql(
       "FROM df2 " +
       "GROUP BY monthDate " +
       "ORDER BY monthDate ASC " +
-      "LIMIT 11")
+      "LIMIT 10")
 df3.show(false)
 
 
