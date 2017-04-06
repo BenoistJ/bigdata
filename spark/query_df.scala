@@ -18,8 +18,7 @@ val df1 = sc.textFile(logFile).
     map(t => AccessLogRecord(t(0), t(1), t(2), t(3), t(4), t(5), t(6), t(7), t(8))).
     toDF
 df1.registerTempTable("df1")
-df1.show(false)
-/*
+
 val df2 = sqlContext.sql(
       "SELECT DISTINCT monthDate, clientIpAddress " +
       "FROM df1 " +
@@ -33,4 +32,4 @@ val df3 = sqlContext.sql(
       "ORDER BY monthDate ASC " +
       "LIMIT 10")
 df3.show(false)
-*/
+
