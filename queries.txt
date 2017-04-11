@@ -51,6 +51,9 @@ GROUP BY monthDate
 ORDER BY monthDate ASC
 LIMIT 10;
 
+SELECT * FROM dataparquetpartitioned
+WHERE dn="www.mydemo.fr" AND monthDate="2016-04-30" AND clientipaddress="81.204.165.192" AND httpstatuscode=301 AND bytessent=20
+
 ##############
 IMPALA
 ##############

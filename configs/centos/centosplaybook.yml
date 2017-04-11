@@ -30,6 +30,10 @@
       yum:
         name: python
 
+    - name: install pip
+      yum:
+        name: python-pip
+
     - name: add aliases
       blockinfile:
         dest=~/.bashrc

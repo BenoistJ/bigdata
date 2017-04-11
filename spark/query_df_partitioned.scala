@@ -1,4 +1,4 @@
-val logFile = "hdfs:///user/root/prepared/big/datafr.csv"
+val logFile = "hdfs:///user/root/datafr.csv"
 
 case class AccessLogRecord (
     clientIpAddress: String,
