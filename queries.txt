@@ -34,7 +34,23 @@ STORED AS TEXTFILE
 LOAD DATA INPATH 'hdfs:///user/root/datacom.csv' INTO TABLE datacsvpartitioned PARTITION (dn="www.mydemo.com")
 LOAD DATA INPATH 'hdfs:///user/root/datafr.csv' INTO TABLE datacsvpartitioned PARTITION (dn="www.mydemo.fr")
 
-CREATE TABLE dataparquet STORED AS parquet AS SELECT * FROM datacsv
+SET avro.output.codec=snappy;
+SET mapred.output.compression.codec=org.apache.hadoop.io.compress.SnappyCodec;
+CREATE TABLE datacsvcompressed
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\;'
+STORED AS TEXTFILE
+AS SELECT * FROM datacsv
+
+SET avro.output.codec=snappy;
+SET mapred.output.compression.codec=org.apache.hadoop.io.compress.SnappyCodec;
+CREATE TABLE dataavro
+STORED AS avro
+AS SELECT * FROM datacsvpartitioned;
+
+CREATE TABLE dataparquet
+STORED AS parquet
+AS SELECT * FROM datacsv
 
 CREATE TABLE dataparquetpartitioned
 PARTITIONED BY (dn)
@@ -49,7 +65,7 @@ FROM (
 ) mysubqueryresult
 GROUP BY monthDate
 ORDER BY monthDate ASC
-LIMIT 10;
+LIMIT 10
 
 SELECT * FROM dataparquetpartitioned
 WHERE dn="www.mydemo.fr" AND monthDate="2016-04-30" AND clientipaddress="81.204.165.192" AND httpstatuscode=301 AND bytessent=20
@@ -65,7 +81,7 @@ FROM (
 ) mysubqueryresult
 GROUP BY monthDate
 ORDER BY monthDate ASC
-LIMIT 10;
+LIMIT 10
 
 
 ##############
