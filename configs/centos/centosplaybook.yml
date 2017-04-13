@@ -26,13 +26,14 @@
       yum:
         name: ntp
 
-    - name: install python
+    - name: install EPEL release
       yum:
-        name: python
+	name: epel-release
 
     - name: install pip
       yum:
         name: python-pip
+        update_cache: true
 
     - name: add aliases
       blockinfile:
