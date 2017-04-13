@@ -291,3 +291,4 @@
         repo: git@github.com:BenoistJ/bigdata.git
         dest: /root
         accept_hostkey: true
+	ignore_errors: true
