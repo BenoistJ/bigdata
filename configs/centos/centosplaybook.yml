@@ -28,12 +28,21 @@
 
     - name: install EPEL release
       yum:
-	name: epel-release
+        name: epel-release
 
     - name: install pip
       yum:
         name: python-pip
         update_cache: true
+
+    - name: install 7zip
+      yum:
+        name: p7zip
+
+    - name: update all packages
+      yum:
+        name: '*'
+        state: latest
 
     - name: add aliases
       blockinfile:
@@ -167,14 +176,6 @@
 
 - hosts: vmmaster
   tasks:        
-    - name: install epel-release
-      yum:
-        name: epel-release
-      
-    - name: install 7zip
-      yum:
-        name: p7zip
-
     - block: 
         - name: install the 'Development tools' package group
           yum:
@@ -251,30 +252,12 @@
             value="false"
             scope=global
 
-    - block:
-        - name: configure ssh client to disable host key checking
-          replace:
-            name: /etc/ssh/ssh_config
-            regexp: "#   StrictHostKeyChecking ask"
-            replace: "   StrictHostKeyChecking no"
+    - name: configure ssh client to disable host key checking
+      replace:
+        name: /etc/ssh/ssh_config
+        regexp: "#   StrictHostKeyChecking ask"
+        replace: "   StrictHostKeyChecking no"
             
-        - name: download authorized_keys
-          get_url:
-            url: https://www.dropbox.com/s/wexmz59rvhhtl4k/id_rsa.pub
-            dest: .ssh/authorized_keys
-            
-        - name: download private certificate
-          get_url:
-            url: https://www.dropbox.com/s/btg3zl510xqf3pm/id_rsa
-            dest: .ssh/id_rsa
-            mode: 0600
-
-        - name: copy ssh files to bigdata2
-          shell: scp -r /root/.ssh/ bigdata2:/root/.ssh/
-          
-        - name: copy ssh files to bigdata3
-          shell: scp -r /root/.ssh/ bigdata3:.ssh/
-
     - block:
         - name: install postgresql
           yum:
