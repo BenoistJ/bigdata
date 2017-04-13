@@ -52,6 +52,7 @@ CREATE TABLE dataparquet
 STORED AS parquet
 AS SELECT * FROM datacsv
 
+#impala only
 CREATE TABLE dataparquetpartitioned
 PARTITIONED BY (dn)
 STORED AS parquet

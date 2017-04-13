@@ -55,6 +55,7 @@
           alias a='clear;docker images;echo;docker ps -a'\n
           alias drm='docker rm -f $(docker ps -a -q)'\n
           alias gc='git commit -am "..."'\n"
+          alias h='hadoop fs'
 
     - name: add '.' to path
       lineinfile:
