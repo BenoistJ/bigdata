@@ -74,6 +74,7 @@ WHERE dn="www.mydemo.fr" AND monthDate="2016-04-30" AND clientipaddress="81.204.
 ##############
 IMPALA
 ##############
+REFRESH dataparquetpartitioned;
 SELECT monthDate, count(clientIpAddress) as total
 FROM (
    SELECT DISTINCT monthDate, clientIpAddress
