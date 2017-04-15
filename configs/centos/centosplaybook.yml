@@ -1,54 +1,33 @@
 ---
 - hosts: vmbase
   tasks:
+    - name: install epel-release
+      yum:
+        name: epel-release
+
     - name: update operating system to latest version
       yum:
         name: '*'
         state: latest
-
-    - name: install vmware tools
-      yum:
-        name: open-vm-tools
-        
-    - name: install nano
-      yum:
-        name: nano
-
-    - name: install nano
-      yum:
-        name: wget
-        
-    - name: install curl
-      yum:
-        name: curl
-
-    - name: install ntp
-      yum:
-        name: ntp
-
-    - name: install EPEL release
-      yum:
-        name: epel-release
-
-    - name: install pip
-      yum:
-        name: python-pip
         update_cache: true
 
-    - name: install 7zip
+    - name: install tools
       yum:
-        name: p7zip
-
-    - name: update all packages
-      yum:
-        name: '*'
-        state: latest
+        name: {{ item }}
+     with_items:
+        - open-vm-tools
+        - nano
+        - wget
+        - curl
+        - ntp
+        - python-pip
+        - p7zip
 
     - name: add aliases
       blockinfile:
-        dest=~/.bashrc
-        create=true
-        block="
+        dest: ~/.bashrc
+        create: true
+        block: "
           cdls() { clear; cd "$@"; ls; echo --------------------------------------------------------------------; }\n
           alias cd=cdls\n
           alias d=docker\n
@@ -59,8 +38,27 @@
 
     - name: add '.' to path
       lineinfile:
-        dest=~/.bashrc
-        line="\nexport PATH=.:$PATH"
+        dest: ~/.bashrc
+        line: "\nexport PATH=.:$PATH"
+
+    - block:
+        - name: remove existing ntp servers
+          lineinfile:
+            dest: /etc/ntp.conf
+            regexp: "{{ item }}"
+            state: absent
+          with_items:
+            - "server 1.centos.pool.ntp.org iburst"
+            - "server 2.centos.pool.ntp.org iburst"
+            - "server 3.centos.pool.ntp.org iburst"
+
+        - name: configure main ntp server
+          replace:
+            dest: /etc/ntp.conf
+            regexp: "server 0.centos.pool.ntp.org iburst"
+            line: "server bigdata1"
+
+        when: "{{ inventory_hostname }} is not 'bigdata1'"
 
     - name: set timezone to Europe/Paris
       timezone:
@@ -91,9 +89,15 @@
         value: 5
         state: present
 
-    - name: change grub timeout
+    - name: change grub default timeout
       replace:
         dest: /etc/default/grub
+        regexp: 'GRUB_TIMEOUT=5'
+        replace: 'GRUB_TIMEOUT=1'
+
+    - name: change grub timeout
+      replace:
+        dest: /etc/grub2.cfg
         regexp: 'GRUB_TIMEOUT=5'
         replace: 'GRUB_TIMEOUT=1'
 
