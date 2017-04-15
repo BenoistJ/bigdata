@@ -113,3 +113,23 @@ FROM (
 GROUP BY monthDate
 ORDER BY monthDate ASC
 LIMIT 10;
+
+
+##########
+TEST INSERTS
+##########
+#http://unmeshasreeveni.blogspot.fr/2014/11/updatedeleteinsert-in-hive-0140.html
+#https://cwiki.apache.org/confluence/display/Hive/Hive+Transactions
+DROP TABLE testinserts;
+CREATE TABLE testinserts (
+ firstname String,
+ lastname String)
+CLUSTERED by (firstname) into 2 buckets
+STORED AS orc TBLPROPERTIES ('transactional'='true');
+INSERT INTO testinserts VALUES ("benoist", "jamin");
+INSERT INTO testinserts VALUES ("thomas", "folliot");
+INSERT INTO testinserts VALUES ("solenne", "robert");
+INSERT INTO testinserts VALUES ("philippe", "lang");
+INSERT INTO testinserts VALUES ("nicolas", "joyeux");
+UPDATE testinserts SET firstname='ben' WHERE firstname='benoist';
+ALTER TABLE testinserts COMPACT 'MAJOR';
