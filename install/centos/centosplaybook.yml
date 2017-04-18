@@ -33,7 +33,7 @@
           alias d=docker\n
           alias a='clear;docker images;echo;docker ps -a'\n
           alias drm='docker rm -f $(docker ps -a -q)'\n
-          alias gc='git commit -am "..."'\n"
+          alias gc='git add .;git commit -am "...";git push'\n"
           alias h='hadoop fs'
 
     - name: add '.' to path
