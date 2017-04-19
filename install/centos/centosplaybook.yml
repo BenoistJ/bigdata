@@ -21,6 +21,7 @@
         - curl
         - ntp
         - python-pip
+        - python-devel
         - p7zip
 
     - name: add aliases
