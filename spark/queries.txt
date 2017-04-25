@@ -1,1 +1,5 @@
+#Apache Spark
 ./bin/spark-submit --class org.apache.spark.examples.SparkPi --master yarn --executor-cores 3 examples/jars/spark-examples*.jar 10
+
+#Cloudera Spark
+spark-submit --class org.apache.spark.examples.SparkPi --master yarn --executor-cores 3 /opt/cloudera/parcels/CDS/lib/spark/lib/spark-examples.jar 10
