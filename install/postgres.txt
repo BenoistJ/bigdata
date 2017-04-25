@@ -1,0 +1,13 @@
+nano /var/lib/cloudera-scm-server-db/data/pg_hba.conf
+Append at end:
+    host    all             all              0.0.0.0/0                       md5
+    host    all             all              ::/0                            md5
+
+systemctl restart cloudera-scm-server-db
+
+cat /var/lib/cloudera-scm-server-db/data/generated_password.txt
+psql -U cloudera-scm -p 7432 -h localhost -d postgres
+
+\l
+\c hive
+\dt
