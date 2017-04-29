@@ -13,8 +13,8 @@
 
     - name: install tools
       yum:
-        name: {{ item }}
-     with_items:
+        name: "{{ item }}"
+      with_items:
         - open-vm-tools
         - nano
         - wget
@@ -28,7 +28,7 @@
       blockinfile:
         dest: ~/.bashrc
         create: true
-        block: "
+        block:
           cdls() { clear; cd "$@"; ls; echo --------------------------------------------------------------------; }\n
           alias cd=cdls\n
           alias d=docker\n
@@ -59,7 +59,7 @@
             regexp: "server 0.centos.pool.ntp.org iburst"
             line: "server bigdata1"
 
-        when: "{{ inventory_hostname }} is not 'bigdata1'"
+      when: "{{ inventory_hostname }} is not 'bigdata1'"
 
     - name: set timezone to Europe/Paris
       timezone:
@@ -297,4 +297,4 @@
         repo: git@github.com:BenoistJ/bigdata.git
         dest: /root
         accept_hostkey: true
-	ignore_errors: true
+        ignore_errors: true
