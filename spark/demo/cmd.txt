@@ -1,0 +1,2 @@
+setenv HADOOP_HOME E:\demo\hadoop
+winutils.exe chmod -R 777 E:\tmp\hive
