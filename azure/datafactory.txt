@@ -1,3 +1,4 @@
+--- Azure SQL
 USE [testbensql2]
 CREATE TABLE [dbo].[log] (
 	[ID]			  INT IDENTITY(1,1)									  NOT NULL,
@@ -8,6 +9,28 @@ CREATE TABLE [dbo].[log] (
 );
 CREATE CLUSTERED INDEX IX_emp_ID ON dbo.log (ID);
 
+--- Azure Datalake Analytic
+@logFile = 
+	EXTRACT
+		clientIpAddress string,
+		domainName string,
+		monthDate string,
+		request string
+	FROM @"dataclean.csv"
+	USING Extractors.Csv();
+@query1 =
+	SELECT DISTINCT monthDate, clientIpAddress
+	FROM @logFile;
+@query2 =
+	SELECT monthDate, COUNT(clientIpAddress) AS Total
+	FROM @query1
+	GROUP BY monthDate
+	ORDER BY monthDate ASC FETCH 10 ROWS;
+OUTPUT @query2
+	TO @"output.log"
+	USING Outputters.Csv();
+
+--- Azure DataFactory
 {
     "name": "AzureDataLakeStoreLinkedService",
     "properties": {
@@ -18,9 +41,7 @@ CREATE CLUSTERED INDEX IX_emp_ID ON dbo.log (ID);
             "dataLakeStoreUri": "adl://bentestadls.azuredatalakestore.net",
             "servicePrincipalId": "3874a1b5-3b09-47e0-af69-5aabe3cbdcc4",
             "servicePrincipalKey": "**********",
-            "tenant": "04741c8c-40ab-4a25-b9f5-41581c922f21",
-            "subscriptionId": "f019b9fc-8732-4ff3-a5cd-1f4b90cf5a9a",
-            "resourceGroupName": "bentest"
+            "tenant": "04741c8c-40ab-4a25-b9f5-41581c922f21"
         }
     }
 }
