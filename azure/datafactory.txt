@@ -1,0 +1,161 @@
+USE [testbensql2]
+CREATE TABLE [dbo].[log] (
+	[ID]			  INT IDENTITY(1,1)									  NOT NULL,
+    [clientIpAddress] NVARCHAR (50)                                       NOT NULL,
+    [domainName]      NVARCHAR (50)                                       NOT NULL,
+    [date]            NVARCHAR (50)                                       NOT NULL,
+    [url]             NVARCHAR (MAX) MASKED WITH (FUNCTION = 'default()') NOT NULL
+);
+CREATE CLUSTERED INDEX IX_emp_ID ON dbo.log (ID);
+
+{
+    "name": "AzureDataLakeStoreLinkedService",
+    "properties": {
+        "description": "",
+        "hubName": "testbendf_hub",
+        "type": "AzureDataLakeStore",
+        "typeProperties": {
+            "dataLakeStoreUri": "adl://bentestadls.azuredatalakestore.net",
+            "servicePrincipalId": "3874a1b5-3b09-47e0-af69-5aabe3cbdcc4",
+            "servicePrincipalKey": "**********",
+            "tenant": "04741c8c-40ab-4a25-b9f5-41581c922f21",
+            "subscriptionId": "f019b9fc-8732-4ff3-a5cd-1f4b90cf5a9a",
+            "resourceGroupName": "bentest"
+        }
+    }
+}
+
+{
+    "name": "AzureSqlLinkedService",
+    "properties": {
+        "description": "",
+        "hubName": "testbendf_hub",
+        "type": "AzureSqlDatabase",
+        "typeProperties": {
+            "connectionString": "Data Source=tcp:testbendb2.database.windows.net,1433;Initial Catalog=testbensql2;Persist Security Info=False;User ID=benoist;Password=**********;MultipleActiveResultSets=False;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False"
+        }
+    }
+}
+{
+    "name": "InputDataSet",
+    "properties": {
+        "structure": [
+            {
+                "name": "clientIpAddress",
+                "type": "String"
+            },
+            {
+                "name": "domainName",
+                "type": "String"
+            },
+            {
+                "name": "date",
+                "type": "String"
+            },
+            {
+                "name": "url",
+                "type": "String"
+            }
+        ],
+        "published": false,
+        "type": "AzureDataLakeStore",
+        "linkedServiceName": "AzureDataLakeStoreLinkedService",
+        "typeProperties": {
+            "fileName": "datacleanlight_schema.csv",
+            "folderPath": "/demo",
+            "format": {
+                "type": "TextFormat",
+                "rowDelimiter": "\n",
+                "firstRowAsHeader": true
+            }
+        },
+        "availability": {
+            "frequency": "Minute",
+            "interval": 20
+        },
+        "external": true,
+        "policy": {}
+    }
+}
+{
+    "name": "OutputDataSet",
+    "properties": {
+        "structure": [
+            {
+                "name": "clientIpAddress",
+                "type": "String"
+            },
+            {
+                "name": "domainName",
+                "type": "String"
+            },
+            {
+                "name": "date",
+                "type": "String"
+            },
+            {
+                "name": "url",
+                "type": "String"
+            }
+        ],
+        "published": false,
+        "type": "AzureSqlTable",
+        "linkedServiceName": "AzureSqlLinkedService",
+        "typeProperties": {
+            "tableName": "log"
+        },
+        "availability": {
+            "frequency": "Minute",
+            "interval": 20
+        },
+        "external": false,
+        "policy": {}
+    }
+}
+{
+    "name": "PipelineBen7",
+    "properties": {
+        "description": "Copy data from adls to Azure SQL",
+        "activities": [
+            {
+                "type": "Copy",
+                "typeProperties": {
+                    "source": {
+                        "type": "BlobSource"
+                    },
+                    "sink": {
+                        "type": "SqlSink",
+                        "writeBatchSize": 10000,
+                        "writeBatchTimeout": "60.00:00:00"
+                    }
+                },
+                "inputs": [
+                    {
+                        "name": "InputDataset"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "name": "OutputDataset"
+                    }
+                ],
+                "policy": {
+                    "timeout": "01:00:00",
+                    "concurrency": 1,
+                    "executionPriorityOrder": "NewestFirst"
+                },
+                "scheduler": {
+                    "frequency": "Minute",
+                    "interval": 20
+                },
+                "name": "CopyFromBlobToSQL"
+            }
+        ],
+        "start": "2017-08-10T09:54:05.5465989Z",
+        "end": "2017-08-11T12:54:05.5465989Z",
+        "isPaused": false,
+        "hubName": "testbendf_hub",
+        "pipelineMode": "Scheduled",
+        "expirationTime": "3.00:00:00"
+    }
+}

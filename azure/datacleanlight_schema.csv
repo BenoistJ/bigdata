@@ -1,0 +1,19 @@
+clientIpAddress;domainName;date;url
+96.18.127.153,www.mydemo.fr,2015-04,GET /download/ 
+96.18.127.153,www.mydemo.com,2015-04,GET /wp-admin/admin-ajax.php
+64.118.163.98,www.mydemo.com,2015-04,GET /store 
+64.118.163.98,www.mydemo.com,2015-04,GET /pricing 
+64.118.163.98,www.mydemo.fr,2015-04,GET /pricing/ 
+194.7.161.147,www.mydemo.com,2015-04,GET /wp-content/uploads/2014/12/2014-12-Merry-Christmas.png 
+96.18.127.153,www.mydemo.com,2015-04,GET / 
+96.18.127.153,www.mydemo.com,2015-04,GET /download/ 
+193.248.131.47,www.mydemo.fr,2015-04,GET /binaries/version4.xml 
+96.18.127.153,www.mydemo.com,2015-04,GET /download/
+96.18.127.153,www.mydemo.com,2015-04,GET /wp-admin/admin-ajax.php
+96.18.127.153,www.mydemo.com,2015-04,GET /download/ 
+96.18.127.153,www.mydemo.fr,2015-04,GET /wp-admin/admin-ajax.php
+185.31.136.59,www.mydemo.com,2015-04,GET / 
+96.18.127.153,www.mydemo.com,2015-04,GET /wp-content/themes/inovado/framework/images/accordion-close.png 
+184.56.174.19,www.mydemo.fr,2015-04,GET /images/youtube.png 
+184.56.174.19,www.mydemo.fr,2015-04,GET /images/youtube.png 
+88.25.87.168,www.mydemo.com,2015-04,GET /binaries/version4.xml 
