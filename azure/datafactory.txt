@@ -1,5 +1,6 @@
 --- Azure SQL
 USE [testbensql2]
+GO
 CREATE TABLE [dbo].[log] (
 	[ID]			  INT IDENTITY(1,1)									  NOT NULL,
     [clientIpAddress] NVARCHAR (50)                                       NOT NULL,
@@ -7,6 +8,7 @@ CREATE TABLE [dbo].[log] (
     [date]            NVARCHAR (50)                                       NOT NULL,
     [url]             NVARCHAR (MAX) MASKED WITH (FUNCTION = 'default()') NOT NULL
 );
+GO
 CREATE CLUSTERED INDEX IX_emp_ID ON dbo.log (ID);
 
 --- Azure Datalake Analytic
